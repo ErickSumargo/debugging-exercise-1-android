@@ -1,6 +1,7 @@
 package com.intrepid.debuggingexercise1;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -18,24 +19,48 @@ public class MainActivity extends AppCompatActivity {
     private int count = 0;
     private Handler handler = new Handler();
     private final int MESSAGE_DURATION = (int) TimeUnit.SECONDS.toMillis(5);
+    private CountDownTimer countDownTimer;
 
     @BindView(R.id.text)
     TextView text;
 
+    @BindView(R.id.countdown)
+    TextView countdown;
+
     @OnClick(R.id.button)
     public void onButtonClick() {
-        text.setText("Button pressed " + ++count + " times.\nThis message will disappear in 5 seconds.\nTap anywhere on the screen to dismiss this message immediately.\n\nWhat happens if you tap the \"Click Here\" button several times?\nDoes the message always appear for 5 seconds?");
+        handler.removeCallbacks(null);
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+
+        text.setText("Button pressed " +
+                             ++count +
+                             " times.\nTap anywhere on the screen to dismiss this message immediately.\n\nWhat happens if you tap the \"Click Here\" button several times?\nDoes the message always appear for 5 seconds?");
         text.setVisibility(VISIBLE);
+        countdown.setVisibility(VISIBLE);
         Runnable timerElapsedCallback = () -> {
             // Hide the message when the timer has elapsed
             text.setVisibility(INVISIBLE);
+            countdown.setVisibility(INVISIBLE);
         };
         handler.postDelayed(timerElapsedCallback, MESSAGE_DURATION);
+
+        countDownTimer = new CountDownTimer(MESSAGE_DURATION, TimeUnit.SECONDS.toMillis(1)) {
+            public void onTick(long millisUntilFinished) {
+                countdown.setText("This message will disappear in " + millisUntilFinished / TimeUnit.SECONDS.toMillis(1) + " seconds.");
+            }
+
+            public void onFinish() {
+                countdown.setText("");
+            }
+        }.start();
     }
 
     @OnClick(R.id.activity_main)
     public void onActivityClick() {
         text.setVisibility(INVISIBLE);
+        countdown.setVisibility(INVISIBLE);
     }
 
     @Override
