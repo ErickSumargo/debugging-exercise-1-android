@@ -17,7 +17,6 @@ import static android.view.View.VISIBLE;
 
 public class MainActivity extends AppCompatActivity {
     private int count = 0;
-    private Handler handler = new Handler();
     private final int MESSAGE_DURATION = (int) TimeUnit.SECONDS.toMillis(5);
     private CountDownTimer countDownTimer;
 
@@ -29,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.button)
     public void onButtonClick() {
-        handler.removeCallbacks(null);
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
@@ -39,12 +37,6 @@ public class MainActivity extends AppCompatActivity {
                              " times.\nTap anywhere on the screen to dismiss this message immediately.\n\nWhat happens if you tap the \"Click Here\" button several times?\nDoes the message always appear for 5 seconds?");
         text.setVisibility(VISIBLE);
         countdown.setVisibility(VISIBLE);
-        Runnable timerElapsedCallback = () -> {
-            // Hide the message when the timer has elapsed
-            text.setVisibility(INVISIBLE);
-            countdown.setVisibility(INVISIBLE);
-        };
-        handler.postDelayed(timerElapsedCallback, MESSAGE_DURATION);
 
         countDownTimer = new CountDownTimer(MESSAGE_DURATION, TimeUnit.SECONDS.toMillis(1)) {
             public void onTick(long millisUntilFinished) {
@@ -52,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onFinish() {
+                text.setVisibility(INVISIBLE);
+                countdown.setVisibility(INVISIBLE);
                 countdown.setText("");
             }
         }.start();
